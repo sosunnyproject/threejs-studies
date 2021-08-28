@@ -36,6 +36,18 @@ function main() {
     makeInstance(geometry, 0xaa4433, 2),
   ]
 
+  function resizeRendererToDisplaySize(renderer) {
+    // drawingbufferimage : resolution pixels - remove blockiness
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.height !== height || canvas.width !== width;
+    if(needResize) {
+      renderer.setSize(width, height, false)
+    }
+    return needResize;
+  }
+
   // single cube
   // const cube = new THREE.Mesh(geometry, material);
   // scene.add(cube);
@@ -55,6 +67,14 @@ function main() {
     time *= 0.001; // convert time from milliseconds to seconds
     // cube.rotation.x = time;
     // cube.rotation.y = time;
+
+    if(resizeRendererToDisplaySize(renderer)) {
+      // responsive design 
+      const canvas = renderer.domElement;
+      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.updateProjectionMatrix();
+    }
+
     cubes.forEach( (cube, index) => {
       const speed = 1 + index * 0.2;
       const rot = time * speed;
@@ -68,6 +88,7 @@ function main() {
   
   requestAnimationFrame(render);
 }
+
 
 
 
