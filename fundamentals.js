@@ -39,8 +39,10 @@ function main() {
   function resizeRendererToDisplaySize(renderer) {
     // drawingbufferimage : resolution pixels - remove blockiness
     const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
+    // upgrade responsive design: hd-dpi display
+    const pixelRatio = window.devicePixelRatio;
+    const width = canvas.clientWidth * pixelRatio | 0;
+    const height = canvas.clientHeight * pixelRatio | 0;
     const needResize = canvas.height !== height || canvas.width !== width;
     if(needResize) {
       renderer.setSize(width, height, false)
