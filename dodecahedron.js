@@ -7,44 +7,47 @@ import * as THREE from './resources/threejs/three.module.js';
 import { GUI } from './resources/dat.gui.module.js';
 
 const params = {
-  width: 10,
-  height: 12.0,
-  cameraZ: 5,
+  radius: 5,
+  detail: 2,
+  cameraZ: 10,
   xpos: 1,
   ypos: 1,
   color: '#00ff00'
 }
-let cube, material;
+let dode, material, line;
 let col;
 
 function main() {
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.1, 1000 );
+  const camera = new THREE.PerspectiveCamera( 130, window.innerWidth / window.innerHeight, 0.1, 1000 );
   scene.background = new THREE.Color(0xAAAAAA)
 
   const renderer = new THREE.WebGLRenderer();
   renderer.setSize( window.innerWidth, window.innerHeight );
   document.body.appendChild( renderer.domElement );
 
-  const geometry = new THREE.BoxGeometry();
+  const geometry = new THREE.DodecahedronGeometry(params.radius, Math.floor(params.detail));
   col = params.color
   material = new THREE.MeshBasicMaterial( { color: col } );
-  cube = new THREE.Mesh( geometry, material );
+  dode = new THREE.Mesh( geometry, material );
 
-  cube.position.x = params.xpos
-  cube.position.y = params.ypos
+  dode.position.x = params.xpos
+  dode.position.y = params.ypos
+  scene.add( dode );
 
-  scene.add( cube );
+  const edges = new THREE.EdgesGeometry( geometry );
+  line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
+  scene.add( line )
 
   camera.position.z = params.cameraZ
 
   const gui = new GUI();
   const guiBox = gui.addFolder('guiBox');
   guiBox.add(params, 'cameraZ', 1, 30).onChange(updateGeom)
-  guiBox.add(params, 'width', 1, 20).onChange(updateGeom)
+  guiBox.add(params, 'radius', 1, 40).onChange(updateGeom)
   guiBox.add(params, 'xpos', -10, 10).onChange(updateGeom)
   guiBox.add(params, 'ypos', -10, 10).onChange(updateGeom)
-  guiBox.add(params, 'height', 1.0, 20.0).onChange(updateGeom)
+  guiBox.add(params, 'detail', 0, 10).onChange(updateGeom)
   guiBox.addColor(params, 'color').onChange(updateColor)
 
   function updateColor(e) {
@@ -54,26 +57,32 @@ function main() {
   }
 
   function updateGeom() {
-    if(cube !== undefined) {
-      cube.geometry.dispose();
-      scene.remove(cube)
+    if(dode !== undefined) {
+      dode.geometry.dispose();
+      scene.remove(dode)
+      scene.remove(line)
     }
 
-    const geometry = new THREE.BoxGeometry(params.width, params.height);
+    const geometry = new THREE.DodecahedronGeometry(params.radius, Math.floor(params.detail));
     material = new THREE.MeshBasicMaterial( { color: params.color } );
-    cube = new THREE.Mesh( geometry, material );
-    cube.position.x = params.xpos
-    cube.position.y = params.ypos
+    dode = new THREE.Mesh( geometry, material );
+    dode.position.x = params.xpos
+    dode.position.y = params.ypos
 
-    scene.add( cube );
+    scene.add( dode );
+
+    const edges = new THREE.EdgesGeometry( geometry );
+    line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
+    scene.add( line )
+
     camera.position.z = params.cameraZ;
   }
 
   const animate = function () {
     requestAnimationFrame( animate );
 
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
+    dode.rotation.x += 0.01;
+    dode.rotation.y += 0.01;
 
     renderer.render( scene, camera );
   };
