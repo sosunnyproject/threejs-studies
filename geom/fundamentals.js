@@ -1,4 +1,4 @@
-import * as THREE from './resources/threejs/three.module.js';
+import * as THREE from '../resources/threejs/three.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');

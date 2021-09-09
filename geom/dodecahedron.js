@@ -2,9 +2,9 @@
 // https://threejs.org/docs/#api/en/math/Color.setStyle
 // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+addColor
 
-import * as THREE from './resources/threejs/three.module.js';
+import * as THREE from '../resources/threejs/three.module.js';
 
-import { GUI } from './resources/dat.gui.module.js';
+import { GUI } from '../resources/dat.gui.module.js';
 
 const params = {
   radius: 5,
