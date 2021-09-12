@@ -2,9 +2,9 @@
 // https://github.com/Proinn/reaction_diffusion_three_js
 
 import * as THREE from '../../resources/threejs/three.module.js';
-// import gs_fragment from './shaders/gs_fragment.glsl'
-import vertex from './shaders/vertex.glsl'
-// import fragment from './shaders/fragment.glsl'
+import gsFragmentShader from './shaders/gs_fragment.glsl.js'
+import vertexShader from './shaders/vertex.glsl.js'
+import fragmentShader from './shaders/fragment.glsl.js'
 import { Float16BufferAttribute, Float32BufferAttribute } from '../resources/threejs/three.module.js';
 
 export default class ReactionDiff {
@@ -56,14 +56,14 @@ export default class ReactionDiff {
     this.difussion_b = 0.5;
 		this.brush_size = 10.;
 
-		// this.addMesh();
-		// this.mouseEffects();
-		// this.render();
+		this.addMesh();
+		this.mouseEffects();
+		this.render();
+    console.log(this.gs_material)
   }
 
   render() {
     //calculate gs step
-    /**
     this.mesh.material = this.gs_material;
     for (let index = 0; index < 8; index++) {
       this.gs_material.uniforms.previous_texture.value = this.prev_target.texture;
@@ -83,24 +83,20 @@ export default class ReactionDiff {
     this.renderer.setRenderTarget(null);
     this.renderer.render(this.scene, this.camera);
     window.requestAnimationFrame(this.render.bind(this));
-     */
   }
 
   mouseEffects() {
-    /**
     this.canvas.addEventListener("mousemove", (e)=>{    
       var mMouseX = e.offsetX;
       var mMouseY = e.offsetY;
         this.gs_material.uniforms.brush.value = new THREE.Vector2(mMouseX/this.canvas.clientWidth, 1-mMouseY/this.canvas.clientHeight );
     });
-     */
   }
 
   addMesh() {
-    /** 
     this.gs_material = new THREE.ShaderMaterial({
-			fragmentShader: gs_fragment,
-			vertexShader: vertex,
+			fragmentShader: gsFragmentShader,
+			vertexShader: vertexShader,
 			uniforms:{
 				killrate_min: {type: 'f', value: this.killrate_min},
 				killrate_max: {type: 'f', value: this.killrate_max},
@@ -119,21 +115,20 @@ export default class ReactionDiff {
 		});
 
       this.screen_material = new THREE.ShaderMaterial({
-			fragmentShader: fragment,
-			vertexShader: vertex,
-			uniforms:{
-                gs_texture: {type: 't', value: undefined},
-			},
-			transparent: true,
-			depthTest: false,
-			depthWrite: false,
-		});
+        fragmentShader: fragmentShader,
+        vertexShader: vertexShader,
+        uniforms:{
+                  gs_texture: {type: 't', value: undefined},
+        },
+        transparent: true,
+        depthTest: false,
+        depthWrite: false,
+      });
 
 		this.plane = new THREE.PlaneGeometry(1.0, 1.0);
 
 		this.mesh = new THREE.Mesh( this.plane, this.material );
 		this.scene.add( this.mesh );
-    */
   }
 }
 

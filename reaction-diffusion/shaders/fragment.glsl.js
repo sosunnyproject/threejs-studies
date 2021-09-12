@@ -1,3 +1,4 @@
+const fragmentShader = `
 varying vec2 vUv;
 uniform sampler2D gs_texture;
 
@@ -7,3 +8,5 @@ void main(){
 
     gl_FragColor = vec4(gs_map, gs_map, gs_map, 1.);
 }
+`
+export default fragmentShader;

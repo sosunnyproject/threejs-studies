@@ -1,3 +1,4 @@
+const gsFragmentShader = `
 varying vec2 vUv;
 uniform sampler2D previous_texture;
 uniform vec2 brush;
@@ -43,3 +44,5 @@ void main(){
 
     
 }
+`
+export default gsFragmentShader;
