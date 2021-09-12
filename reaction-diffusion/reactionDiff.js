@@ -1,5 +1,6 @@
 // https://michielbraat.nl/blog/reaction-diffusion/
 // https://github.com/Proinn/reaction_diffusion_three_js
+// tips to add shader codes without npm module: https://www.youtube.com/watch?v=gDQBbDlAEKs
 
 import * as THREE from '../../resources/threejs/three.module.js';
 import gsFragmentShader from './shaders/gs_fragment.glsl.js'
