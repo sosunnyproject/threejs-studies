@@ -5,6 +5,7 @@
 import * as THREE from '../resources/threejs/three.module.js';
 
 import { GUI } from '../resources/dat.gui.module.js';
+import { OrbitControls } from '../resources/OrbitControls.js';
 
 const params = {
   radius: 5,
@@ -37,9 +38,9 @@ function main() {
 
   const edges = new THREE.EdgesGeometry( geometry );
   line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
-  scene.add( line )
+  scene.add( line );
 
-  camera.position.z = params.cameraZ
+  camera.position.z = params.cameraZ;
 
   const gui = new GUI();
   const guiBox = gui.addFolder('guiBox');
@@ -49,6 +50,12 @@ function main() {
   guiBox.add(params, 'ypos', -10, 10).onChange(updateGeom)
   guiBox.add(params, 'detail', 0, 10).onChange(updateGeom)
   guiBox.addColor(params, 'color').onChange(updateColor)
+
+  // orbit controls
+  const controls = new OrbitControls( camera, renderer.domElement);
+  controls.enableZoom = true;
+  controls.enableDamping = true;
+  controls.update();
 
   function updateColor(e) {
     const newCol = e
@@ -83,6 +90,7 @@ function main() {
 
     dode.rotation.x += 0.01;
     dode.rotation.y += 0.01;
+    controls.update();
 
     renderer.render( scene, camera );
   };
