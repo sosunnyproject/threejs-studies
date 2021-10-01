@@ -80,7 +80,7 @@ function main() {
     scene.add(tree);  
   }
 
-  const shaderTree = makeShaderTree(10, 15, 0)
+  const shaderTree = makeShaderTree(10, -15, 0)
   scene.add(shaderTree)
 
   // camera gui
