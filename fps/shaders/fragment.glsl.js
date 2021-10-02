@@ -1,25 +1,72 @@
+// Author: @patriciogv
+// Title: CellularNoise
+
 const fragmentShader = `
 #ifdef GL_ES
 precision mediump float;
 #endif
 
+#define TWO_PI 6.28318530718
+
 uniform vec2 u_resolution;
 uniform float u_time;
+varying vec2 vUv;
 
-vec3 colorA = vec3(0.149,0.141,0.912);
-vec3 colorB = vec3(1.000,0.833,0.224);
+vec2 random2( vec2 p ) {
+    return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
+}
 
 void main() {
-    vec3 color = vec3(0.0);
+    vec2 st = vUv;
+    // st.x *= u_resolution.x/u_resolution.y;
+    vec3 color = vec3(.0);
 
-    float pct = abs(sin(u_time));
+    // Scale
+    st *= 3.;
 
-    // Mix uses pct (a value from 0-1) to
-    // mix the two colors
-    color = mix(colorA, colorB, pct);
+    // Tile the space
+    vec2 i_st = floor(st);
+    vec2 f_st = fract(st);
+
+    float m_dist = 1.;  // minimum distance
+
+    for (int y= -1; y <= 1; y++) {
+        for (int x= -1; x <= 1; x++) {
+            // Neighbor place in the grid
+            vec2 neighbor = vec2(float(x),float(y));
+
+            // Random position from current + neighbor place in the grid
+            vec2 point = random2(i_st + neighbor);
+
+			// Animate the point
+            point = 0.5 + 0.5*sin(u_time + 6.2831*point);
+
+			// Vector between the pixel and the point
+            vec2 diff = neighbor + point - f_st;
+
+            // Distance to the point
+            float dist = length(diff);
+
+            // Keep the closer distance
+            m_dist = min(m_dist, dist);
+        }
+    }
+
+    // Draw the min distance (distance field)
+    color += m_dist;
+    color.g = mod(u_time + 20.0, 200.0);
+    color.b = mod(u_time*0.1, 50.0);
+
+    // Draw cell center
+    color += 1.-step(.02, m_dist);
+
+    // Draw grid
+    // color.r += step(.98, f_st.x) + step(.98, f_st.y);
+
+    // Show isolines
+    // color -= step(.7,abs(sin(27.0*m_dist)))*.5;
 
     gl_FragColor = vec4(color,1.0);
 }
-
 `
 export default fragmentShader;
