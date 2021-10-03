@@ -5,9 +5,6 @@ import { WEBGL } from '../resources/WebGL.js';
 import Stats from '../resources/stats.module.js';
 import { OrbitControls } from '../resources/OrbitControls.js';
 import { FirstPersonControls } from '../resources/FirstPersonControls.js';
-import vertexShader from './shaders/vertex.glsl.js'
-import fragmentShader from './shaders/fragment.glsl.js'
-import Perlin from '../resources/perlin.js';
 import { getRandomArbitrary, getRandomInt } from './globalfunctions.js';
 import { generateShaderTree, generateTree } from './trees.js';
 import { generateMushroom } from './mushrooms.js';
@@ -28,6 +25,8 @@ const params = {
   zFar: 1000
 }
 
+const gui = new GUI();
+export let shaderTree;
 const WIDTH = window.innerWidth, HEIGHT = window.innerHeight
 var clock = new THREE.Clock();
 let stats, scene, camera, renderer;
@@ -53,7 +52,7 @@ function main() {
   renderer.setSize(WIDTH, HEIGHT);
   renderer.shadowMap.enabled = true;
 
-  const shaderTree = generateShaderTree(10, 15, 0)
+  shaderTree = generateShaderTree(10, 15, 0, gui)
   scene.add(shaderTree)
 
   // mushrooms
@@ -101,7 +100,6 @@ function main() {
   // var camControls = new FirstPersonControls(camera);
   
   // camera gui
-  const gui = new GUI();
   const guiBox = gui.addFolder('guiBox');
   guiBox.add(params, 'fov', 1, 100).onChange(makeCamera)
   guiBox.add(params, 'aspect', 1, 20).onChange(makeCamera)
@@ -114,23 +112,23 @@ function animate() {
   requestAnimationFrame( animate );
   render();
   stats.update();
-
 };
 
+// including animation loop
 function render() {
 
   const time = performance.now();
 
   // send time data to shaders
-  const treeMesh = scene.children[ 0 ].children[0];
-  const mushroomMesh = scene.children[ 1 ];
+  const mushroomMesh = scene.children[ 1 ].children[0];
+  if(shaderTree !== undefined) {
+    shaderTree.rotation.y = time * 0.00075;
+    shaderTree.material.uniforms.u_time.value = time * 0.00075;  
+  }
 
-  treeMesh.rotation.y = time * 0.00075;
-  treeMesh.material.uniforms.u_time.value = time * 0.00075;
-
-  mushroomMesh.rotation.z = time * 0.00075;
-  mushroomMesh.material.uniforms.u_time.value = time * 0.01;
-
+  mushroomMesh.rotation.y = time * 0.00075;
+  // mushroomMesh.material.uniforms.u_time.value = time * 0.01;
+  // scene.children[ 1 ].children[1].rotation.y = time * 0.00075
   renderer.render( scene, camera );
 }
 
