@@ -8,6 +8,10 @@ import { FirstPersonControls } from '../resources/FirstPersonControls.js';
 import vertexShader from './shaders/vertex.glsl.js'
 import fragmentShader from './shaders/fragment.glsl.js'
 import Perlin from '../resources/perlin.js';
+import { getRandomArbitrary, getRandomInt } from './globalfunctions.js';
+import { generateShaderTree, generateTree } from './trees.js';
+import { generateMushroom } from './mushrooms.js';
+import { generateGround } from './ground.js';
 
 const treeParams = {
   radius: 7,
@@ -27,8 +31,6 @@ const params = {
 const WIDTH = window.innerWidth, HEIGHT = window.innerHeight
 var clock = new THREE.Clock();
 let stats, scene, camera, renderer;
-let date = new Date();
-let pn = new Perlin('rnd' + date.getTime());
 
 function main() {
   // create a scene, that will hold all our elements such as objects, cameras and lights.
@@ -51,8 +53,12 @@ function main() {
   renderer.setSize(WIDTH, HEIGHT);
   renderer.shadowMap.enabled = true;
 
-  const shaderTree = makeShaderTree(10, 15, 0)
+  const shaderTree = generateShaderTree(10, 15, 0)
   scene.add(shaderTree)
+
+  // mushrooms
+  const m = generateMushroom()
+  scene.add(m)
   
   // orbit controls
   const controls = new OrbitControls( camera, renderer.domElement);
@@ -63,7 +69,7 @@ function main() {
   // tree object
   for(let i = 0; i < 100; i++){
     const x = getRandomArbitrary(-200, 200)
-    const tree = makeTree(x, 15, getRandomArbitrary(-100, 100))
+    const tree = generateTree(x, 15, getRandomArbitrary(-100, 100))
     scene.add(tree);  
   }
 
@@ -83,27 +89,7 @@ function main() {
     scene.add(spotlight)
   }
 
-  var groundGeometry = new THREE.PlaneGeometry(300, 300, 60, 80);
-  const position = groundGeometry.attributes.position;
-  const vec = new THREE.Vector3();
-  const newVectors = []
-  for(let i = 0, n = position.count; i < n; i++){
-    vec.fromBufferAttribute(position, i);
-    let value = pn.noise(vec.x / 2, vec.y / 2, 0);
-    vec.z = value * 10;
-
-    newVectors.push(vec.x)
-    newVectors.push(vec.y)
-    newVectors.push(vec.z)
-  }
-  groundGeometry.setAttribute('position',  new THREE.Float32BufferAttribute( newVectors, 3 ) );
-
-  var groundMaterial = new THREE.MeshPhongMaterial({ color: 0xccccc, side: THREE.DoubleSide });
-  var groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
-
-  groundMesh.rotation.x = -0.5*Math.PI;
-  groundMesh.position.y = -5;
-  groundMesh.receiveShadow = true;
+  const groundMesh = generateGround();
   scene.add(groundMesh)
 
   // position and point the camera to the center of the scene
@@ -135,78 +121,19 @@ function render() {
 
   const time = performance.now();
 
-  const object = scene.children[ 0 ];
-  const shaderMat = object.children[0].material;
+  // send time data to shaders
+  const treeMesh = scene.children[ 0 ].children[0];
+  const mushroomMesh = scene.children[ 1 ];
 
-  object.children[0].rotation.y = time * 0.00075;
-  shaderMat.uniforms.u_time.value = time * 0.00075;
+  treeMesh.rotation.y = time * 0.00075;
+  treeMesh.material.uniforms.u_time.value = time * 0.00075;
+
+  mushroomMesh.rotation.z = time * 0.00075;
+  mushroomMesh.material.uniforms.u_time.value = time * 0.01;
 
   renderer.render( scene, camera );
-
 }
 
-function makeTree(xpos, ypos, zpos) {
-
-  const tree = new THREE.Object3D();
-  
-  const grassColors = ["rgb(227, 101, 91)", "rgb(220, 214, 247)", "rgb(217, 237, 146)", "rgb(181,228,140)", "rgb(153,217,140)", "rgb(118,200,147)", "rgb(82,182,154)", "rgb(52,160,164)"]
-  const grassInd = getRandomInt(0, grassColors.length)
-  const grassGeometry = new THREE.DodecahedronGeometry(getRandomArbitrary(4.0, 10.0), getRandomInt(0, 3))
-  const grassMaterial = new THREE.MeshPhongMaterial( { color: grassColors[grassInd] } );
-  const grassMesh = new THREE.Mesh( grassGeometry, grassMaterial );
-  grassMesh.position.x = xpos
-  grassMesh.position.y = ypos
-  grassMesh.position.z = zpos
-  grassMesh.castShadow = true;
-  tree.add(grassMesh)
-
-  const trunkColors = [ "rgb(232, 174, 183)", "rgb(115, 72, 48)", "rgb(94, 116, 127)", "rgb(197, 152, 73)", "rgb(156, 179, 128)" ]
-  const colorIndex = getRandomInt(0, trunkColors.length)
-  const trunkGeometry = new THREE.CylinderGeometry(1, 2, 6, 12)
-  const trunkMaterial = new THREE.MeshPhongMaterial({ color: trunkColors[colorIndex] })
-  const trunkMesh = new THREE.Mesh( trunkGeometry, trunkMaterial );
-  trunkMesh.position.x = xpos
-  trunkMesh.position.y = ypos - 10
-  trunkMesh.position.z = zpos
-  trunkMesh.castShadow = true;
-  tree.add(trunkMesh);
-
-  return tree
-}
-
-function makeShaderTree(xpos, ypos, zpos) {
-
-  const tree = new THREE.Object3D();
-  
-  const grassColors = ["rgb(227, 101, 91)", "rgb(220, 214, 247)", "rgb(217, 237, 146)", "rgb(181,228,140)", "rgb(153,217,140)", "rgb(118,200,147)", "rgb(82,182,154)", "rgb(52,160,164)"]
-  const grassInd = getRandomInt(0, grassColors.length)
-  const grassGeometry = new THREE.DodecahedronGeometry(30.0, getRandomInt(1, 4))
-  const grassShader = new THREE.ShaderMaterial( {
-    uniforms: {
-      u_time: { value: 1.0 },
-      u_resolution: { value: new THREE.Vector2() }
-    },
-    vertexShader: vertexShader,  
-    fragmentShader: fragmentShader
-  } );  
-  const grassMesh = new THREE.Mesh( grassGeometry, grassShader );
-  grassMesh.position.x = xpos
-  grassMesh.position.y = ypos + 30
-  grassMesh.position.z = zpos
-  tree.add(grassMesh)
-
-  const trunkColors = [ "rgb(232, 174, 183)", "rgb(115, 72, 48)", "rgb(94, 116, 127)", "rgb(197, 152, 73)", "rgb(156, 179, 128)" ]
-  const colorIndex = getRandomInt(0, trunkColors.length)
-  const trunkGeometry = new THREE.CylinderGeometry(2, 4, 18, 12)
-  const trunkMaterial = new THREE.MeshBasicMaterial({ color: trunkColors[colorIndex] })
-  const trunkMesh = new THREE.Mesh( trunkGeometry, trunkMaterial );
-  trunkMesh.position.x = xpos
-  trunkMesh.position.y = ypos - 5
-  trunkMesh.position.z = zpos
-  tree.add(trunkMesh);
-
-  return tree
-}
 
 if(!WEBGL.isWebGLAvailable()) {
   const warning = WEBGL.getWebGLErrorMessage();
@@ -225,14 +152,4 @@ function initStats() {
   stats.domElement.style.top = '0px';
   document.querySelector("#stats-output").append(stats.domElement);
   return stats;
-}
-
-function getRandomArbitrary(min, max) {
-  return Math.random() * (max - min) + min;
-}
-
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
