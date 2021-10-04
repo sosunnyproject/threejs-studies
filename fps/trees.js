@@ -71,7 +71,6 @@ function draw(position) {
     fragmentShader: fragmentShader
   } );  
   const grass = new THREE.Mesh( grassGeometry, grassShader );
-  console.log(position)
   const grassMesh = updateGeometry(grass, grassGeometry, position)
  
   //  const trunkColors = [ "rgb(232, 174, 183)", "rgb(115, 72, 48)", "rgb(94, 116, 127)", "rgb(197, 152, 73)", "rgb(156, 179, 128)" ]
@@ -91,7 +90,6 @@ function updateGeometry( mesh, newGeometry, pos ) {
   const { x, y, z} = pos
 
   if(shaderTree !== undefined) {
-    console.log(shaderTree)
     shaderTree.geometry.dispose()
     shaderTree.geometry = newGeometry
     shaderTree.position.x = x
@@ -102,7 +100,6 @@ function updateGeometry( mesh, newGeometry, pos ) {
     mesh.position.y = y
     mesh.position.z = z
   }
-
 
   // these do not update nicely together if shared
   return mesh

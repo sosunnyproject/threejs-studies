@@ -9,6 +9,9 @@ import { getRandomArbitrary, getRandomInt } from './globalfunctions.js';
 import { generateShaderTree, generateTree } from './trees.js';
 import { generateMushroom } from './mushrooms.js';
 import { generateGround } from './ground.js';
+import { OBJLoader } from '../resources/loaders/OBJLoader.js';
+import { MTLLoader } from '../resources/loaders/MTLLoader.js';
+import { GLTFLoader } from '../resources/loaders/GLTFLoader.js';
 
 const treeParams = {
   radius: 7,
@@ -105,7 +108,41 @@ function main() {
   guiBox.add(params, 'aspect', 1, 20).onChange(makeCamera)
   guiBox.add(params, 'zNear', 0.1, 1).onChange(makeCamera)
   guiBox.add(params, 'zFar', 500, 2000).onChange(makeCamera)
+ 
+  // 3d model loader
+  // https://sbcode.net/threejs/gltf-animation/
 
+  const gltfLoader = new GLTFLoader();
+  gltfLoader.load (
+    '../resources/threed/cactus.glb',
+    onLoad,
+    function (xhr) {
+      console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+    },
+    function (error) {
+      console.log("error?", error)
+    }
+  )
+  
+  gltfLoader.load (
+    '../resources/threed/wee.glb',
+    (gltf) => onLoad(gltf, 50),
+    function (xhr) {
+      console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+    },
+    function (error) {
+      console.log("error?", error)
+    }
+  )
+
+  function onLoad(gltf, x, y) {
+    gltf.scene.position.y = y || 30;
+    gltf.scene.position.x = x || -50;
+    gltf.scene.scale.x = 4;
+    gltf.scene.scale.y = 4;
+    gltf.scene.scale.z = 4;
+    scene.add(gltf.scene);
+  }
 }
 
 function animate() {
