@@ -4,7 +4,7 @@ import { WEBGL } from '../resources/WebGL.js';
 import Stats from '../resources/stats.module.js';
 import { OrbitControls } from '../resources/OrbitControls.js';
 import vertexShader from './shaders/vertex.glsl.js'
-import fragmentShader from './shaders/fragment.glsl.js'
+import waterSampleFragment from './shaders/water.frag.js'
 import Perlin from '../resources/perlin.js';
 import { getRandomArbitrary, getRandomInt } from './globalfunctions.js';
 import { shaderTree } from './render.js';
@@ -68,7 +68,7 @@ function draw(position) {
       u_resolution: { value: new THREE.Vector2() }
     },
     vertexShader: vertexShader,  
-    fragmentShader: fragmentShader
+    fragmentShader: waterSampleFragment
   } );  
   const grass = new THREE.Mesh( grassGeometry, grassShader );
   const grassMesh = updateGeometry(grass, grassGeometry, position)
