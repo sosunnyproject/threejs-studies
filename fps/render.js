@@ -96,6 +96,14 @@ function main() {
     scene.add(tree);  
   }
 
+  // torus knot
+  const torusKnotGeom = new THREE.TorusKnotGeometry( 10, 6, 100, 20 );
+  const torusKnotMat = new THREE.MeshPhongMaterial( {color: 0x00d4ff });
+  const torusKnot = new THREE.Mesh( torusKnotGeom, torusKnotMat );
+  torusKnot.position.y = 60;
+  torusKnot.position.x = -40;
+  scene.add(torusKnot);
+
   var axes = new THREE.AxesHelper(20);
   scene.add(axes);
 
