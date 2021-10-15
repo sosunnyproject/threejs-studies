@@ -14,6 +14,19 @@ import { MTLLoader } from '../resources/loaders/MTLLoader.js';
 import { GLTFLoader } from '../resources/loaders/GLTFLoader.js';
 import { PointerLockControls } from '../resources/PointerLockControls.js';
 
+// socket test
+const io = window.io;
+
+async function testSocket() {
+  const socket = await io(`http://${window.location.hostname}:${3000}`,  { transports : ['websocket'] })
+  // client-side
+  socket.on("connect", () => {
+    console.log(socket.id); // x8WIv7-mJelg7on_ALbx
+  });
+}
+
+testSocket()
+
 const treeParams = {
   radius: 7,
   detail: 5,
