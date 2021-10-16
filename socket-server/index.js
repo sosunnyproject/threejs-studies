@@ -18,9 +18,34 @@ server.listen(3000, () => {
 });
 
 io.on('connection', (socket) => {
- console.log('a user connected');
- console.log(socket.id);
- socket.on('disconnect', () => {
-  console.log('user disconnected');
-});
+  console.log('a user connected');
+  console.log(socket.id);
+
+  socket.broadcast.emit('hi');
+  
+  // socket.on('chat message', (msg) => {
+  //   console.log('message: ' + msg);
+  //   io.emit('chat message', msg);
+  // });
+
+  socket.on('UP BUTTON', (touch) => {
+    io.emit('UP BUTTON', touch)
+  });
+
+  socket.on('RIGHT BUTTON', (touch) => {
+    io.emit('RIGHT BUTTON', touch)
+  });
+
+  socket.on('LEFT BUTTON', (touch) => {
+    io.emit('LEFT BUTTON', touch)
+  });
+
+  socket.on('DOWN BUTTON', (touch) => {
+    io.emit('DOWN BUTTON', touch)
+  });
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+
 });

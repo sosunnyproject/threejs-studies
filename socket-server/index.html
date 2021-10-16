@@ -3,22 +3,116 @@
   <head>
     <title>Socket.IO chat</title>
     <style>
-      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      body { 
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        margin: 0 auto; 
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+      }
 
-      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
-      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
-      #input:focus { outline: none; }
-      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
-
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages > li { padding: 0.5rem 1rem; }
-      #messages > li:nth-child(odd) { background: #efefef; }
+      button {
+        display: block; 
+        margin: 1.2rem;
+        padding: 50px; 
+        width: 50%;
+        font-size: 2rem;
+      }
     </style>
+
   </head>
   <body>
-    <ul id="messages"></ul>
-    <form id="form" action="">
-      <input id="input" autocomplete="off" /><button>Send</button>
-    </form>
+    <div>
+      <button id="up">UP</button>
+    </div>
+    <div>
+      <button id="left">LEFT</button>
+    </div>
+    <div>
+      <button id="right">RIGHT</button>
+    </div>
+    <div>
+      <button id="down">DOWN</button>
+    </div>
+    <div id="upbtn"></div>
+    <div id="downbtn"></div>
+    <div id="leftbtn"></div>
+    <div id="rightbtn"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      // client-side
+      var socket = io();
+
+      var up = document.getElementById("up");
+      var down = document.getElementById("down");
+      var left = document.getElementById("left");
+      var right = document.getElementById("right");
+
+      up.addEventListener('touchstart', upBtnEvent);
+      up.addEventListener('touchend', upBtnEvent);
+
+      down.addEventListener('touchstart', downBtnEvent);
+      down.addEventListener('touchend', downBtnEvent);
+
+      left.addEventListener('touchstart', leftBtnEvent);
+      left.addEventListener('touchend', leftBtnEvent);
+
+      right.addEventListener('touchstart', rightBtnEvent);
+      right.addEventListener('touchend', rightBtnEvent);
+
+      function upBtnEvent(e) {
+        e.preventDefault();
+        var upBtn = document.getElementById('upbtn');
+        upBtn.textContent = "up? " + e.type;
+
+        if(e.type === 'touchstart') {
+          up.style.backgroundColor ="red"
+        } else {
+          up.style.backgroundColor ="white"
+        }
+        socket.emit('UP BUTTON', e.type);
+      }
+
+      function downBtnEvent(e) {
+        e.preventDefault();
+        var downBtn = document.getElementById('downbtn')
+        downBtn.textContent = "down? " + e.type;
+
+        if(e.type === 'touchstart') {
+          down.style.backgroundColor ="red"
+        } else {
+          down.style.backgroundColor ="white"
+        }
+
+        socket.emit('DOWN BUTTON', e.type);
+      }
+
+      function leftBtnEvent(e) {
+        e.preventDefault();
+        var upBtn = document.getElementById('leftbtn')
+        upBtn.textContent = "left? " + e.type;
+        socket.emit('LEFT BUTTON', e.type);
+
+        if(e.type === 'touchstart') {
+          left.style.backgroundColor ="red"
+        } else {
+          left.style.backgroundColor ="white"
+        }
+      }
+
+      function rightBtnEvent(e) {
+        e.preventDefault();
+        var rightBtn = document.getElementById('rightbtn')
+        rightBtn.textContent = "right? " + e.type;
+        socket.emit('RIGHT BUTTON', e.type);
+
+        if(e.type === 'touchstart') {
+          right.style.backgroundColor ="red"
+        } else {
+          right.style.backgroundColor ="white"
+        }
+      }
+    </script>
   </body>
 </html>
