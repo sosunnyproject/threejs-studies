@@ -14,19 +14,6 @@ import { MTLLoader } from '../resources/loaders/MTLLoader.js';
 import { GLTFLoader } from '../resources/loaders/GLTFLoader.js';
 import { PointerLockControls } from '../resources/PointerLockControls.js';
 
-// socket test
-const io = window.io;
-
-async function testSocket() {
-  const socket = await io(`http://${window.location.hostname}:${3000}`,  { transports : ['websocket'] })
-  // client-side
-  socket.on("connect", () => {
-    console.log(socket.id); // x8WIv7-mJelg7on_ALbx
-  });
-}
-
-testSocket()
-
 const treeParams = {
   radius: 7,
   detail: 5,
@@ -63,6 +50,54 @@ export let shaderTree;
 const gui = new GUI();
 const WIDTH = window.innerWidth, HEIGHT = window.innerHeight
 var clock = new THREE.Clock();
+
+// socket test
+const io = window.io;
+
+async function testSocket() {
+  const socket = await io(`http://192.168.219.104:${3000}`,  { transports : ['websocket'] })
+  // client-side
+  socket.on("connect", () => {
+    console.log(socket.id); // x8WIv7-mJelg7on_ALbx
+  });
+
+  socket.on('UP BUTTON', (touch) => {
+    console.log("UP: " + touch)
+    if(touch === "touchstart") {
+      moveForward = true;
+    } else if (touch === "touchend") {
+      moveForward = false;
+    }
+  });
+
+  socket.on('LEFT BUTTON', (touch) => {
+    console.log("LEFT: " + touch)
+    if(touch === "touchstart") {
+      moveLeft = true;
+    } else if (touch === "touchend") {
+      moveLeft = false;
+    }
+  });
+  socket.on('RIGHT BUTTON', (touch) => {
+    console.log("RIGHT: " + touch)
+    if(touch === "touchstart") {
+      moveRight = true;
+    } else if (touch === "touchend") {
+      moveRight = false;
+    }
+  });
+
+  socket.on('DOWN BUTTON', (touch) => {
+    console.log("DOWN: " + touch)
+    if(touch === "touchstart") {
+      moveBackward = true;
+    } else if (touch === "touchend") {
+      moveBackward = false;
+    }
+  });
+}
+
+testSocket()
 
 function main() {
   // create a scene, that will hold all our elements such as objects, cameras and lights.
