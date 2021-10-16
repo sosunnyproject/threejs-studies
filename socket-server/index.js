@@ -29,18 +29,22 @@ io.on('connection', (socket) => {
   // });
 
   socket.on('UP BUTTON', (touch) => {
+    console.log(touch)
     io.emit('UP BUTTON', touch)
   });
 
   socket.on('RIGHT BUTTON', (touch) => {
+    console.log(touch)
     io.emit('RIGHT BUTTON', touch)
   });
 
   socket.on('LEFT BUTTON', (touch) => {
+    console.log(touch)
     io.emit('LEFT BUTTON', touch)
   });
 
   socket.on('DOWN BUTTON', (touch) => {
+    console.log(touch)
     io.emit('DOWN BUTTON', touch)
   });
 
